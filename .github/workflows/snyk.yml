@@ -1,0 +1,47 @@
+name: Snyk Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # (可選) 建 image 給 container 掃描
+      - name: Build Docker image
+        run: docker build -t snyk-demo:latest .
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Snyk
+        run: npm i -g snyk
+
+      - name: Auth Snyk
+        run: snyk auth $SNYK_TOKEN
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # SCA：掃相依套件
+      - name: Snyk Open Source (SCA)
+        run: snyk test --severity-threshold=high --fail-on=all
+
+      # SAST：掃程式碼
+      - name: Snyk Code (SAST)
+        run: snyk code test --severity-threshold=high
+
+      # Container：掃映像 & Dockerfile 建議
+      - name: Snyk Container
+        run: snyk container test snyk-demo:latest --file=Dockerfile --severity-threshold=high
+
+      # Monitor：把結果送上 Snyk 追蹤（長期情資更新）
+      - name: Snyk Monitor
+        run: |
+          snyk monitor
+          snyk container monitor snyk-demo:latest --file=Dockerfile
