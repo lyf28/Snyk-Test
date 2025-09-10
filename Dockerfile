@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:20.19.5-alpine3.22
 WORKDIR /app
 # 升級內建 npm（或使用 corepack）
 RUN npm i -g npm@latest
