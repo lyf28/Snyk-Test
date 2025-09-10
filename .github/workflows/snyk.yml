@@ -5,6 +5,9 @@ on:
   push:
     branches: [ main ]
 
+env:
+  SNYK_ORG: lyf28
+
 jobs:
   snyk:
     runs-on: ubuntu-latest
@@ -33,18 +36,18 @@ jobs:
 
       # SCA：掃相依套件
       - name: Snyk Open Source (SCA)
-        run: snyk test --severity-threshold=high --fail-on=all
+        run: snyk test --org=${{ env.SNYK_ORG }} --severity-threshold=high --fail-on=all
 
       # SAST：掃程式碼
       - name: Snyk Code (SAST)
-        run: snyk code test --severity-threshold=high
+        run: snyk code test --org=${{ env.SNYK_ORG }} --severity-threshold=high
 
       # Container：掃映像 & Dockerfile 建議
       - name: Snyk Container
-        run: snyk container test snyk-demo:latest --file=Dockerfile --severity-threshold=high
+        run: snyk container test snyk-demo:latest --file=Dockerfile --org=${{ env.SNYK_ORG }} --severity-threshold=high
 
       # Monitor：把結果送上 Snyk 追蹤（長期情資更新）
       - name: Snyk Monitor
         run: |
           snyk monitor
-          snyk container monitor snyk-demo:latest --file=Dockerfile
+          snyk container monitor snyk-demo:latest --file=Dockerfile --org=${{ env.SNYK_ORG }}
