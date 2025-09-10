@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20.19.5-trixie-slim
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --production
