@@ -28,6 +28,9 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: Install dependencies 
+        run: npm install
+
       # SCA：掃相依套件
       - name: Snyk Open Source (SCA)
         run: snyk test --severity-threshold=high --fail-on=all
